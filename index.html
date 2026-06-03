@@ -19,9 +19,9 @@
 
     <!-- INSIGHTS TAB -->
     <div id="view-insights">
-      <div style="display:flex;gap:4px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:3px;border:0.5px solid var(--color-border-tertiary);display:inline-flex;margin-bottom:1.25rem;">
+      <div style="display:inline-flex;gap:4px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:3px;border:0.5px solid var(--color-border-tertiary);margin-bottom:1.25rem;">
         <button onclick="setPeriod(7,this)" style="padding:5px 12px;border-radius:6px;border:none;background:transparent;cursor:pointer;font-size:12px;color:var(--color-text-secondary)">7 өдөр</button>
-        <button onclick="setPeriod(28,this)" style="padding:5px 12px;border-radius:6px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);cursor:pointer;font-size:12px;font-weight:500;color:var(--color-text-primary)">28 өдөр</button>
+        <button onclick="setPeriod(28,this)" id="btn28" style="padding:5px 12px;border-radius:6px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);cursor:pointer;font-size:12px;font-weight:500;color:var(--color-text-primary)">28 өдөр</button>
         <button onclick="setPeriod(90,this)" style="padding:5px 12px;border-radius:6px;border:none;background:transparent;cursor:pointer;font-size:12px;color:var(--color-text-secondary)">90 өдөр</button>
       </div>
       <div id="stat-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.5rem;"></div>
@@ -53,16 +53,15 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-const TOKEN = "EAAd4SZASPQAcBRoMTuXDYOPVszoxXRHuxMd2s9xcQqhL3eMqbpAo1ZBc0PCYGq6EpUsHq3JY4wRT5FaCZA1IbLBnTXF3TiviqFIZBaX1e354T8SG8GjU5LZAKKibM4ZBFsi1RWbgeheGe5adDFuT2bVdAuIEphakZCFZBJVAXDea54R1K8uktoZBOcTJyzBvzY0RSd0PzPOoEP9ZCZA9ks210wWDbnuoiBct447EgZDZD";
+const TOKEN = "EAAd4SZASPQAcBRpEgegZBYx1Xl1ZAHJqTTYVNCaiuHfOm8FHVUb2KZAWbVw7Nzbg7xkanEQIZBYSurj9f3cT3HqKTUnDGNZA1Qv4MKV4BYZCyaZCZBUZAfgv2G9zem8pnlIXTlZCIkSoZAmC0voS4DevLVkEixAosV19yWyb0f52WtURKy2BptjWG2VsZAvMnR5KlDJ5De1O4yBcXtYElbxhLYyzhKpMA9jcVYxndwm6sNhIPpUkZB77M4E8Tvf9s4oTPu9koZBw5cBFsVGjrGV13y3kXHuZCwZDZD";
 const BASE = "https://graph.facebook.com/v19.0";
 
-// v19 дээр ажилладаг баталгаажсан metric нэрүүд
 const METRICS = [
-  {key:"page_impressions",       label:"Impressions",   color:"#534AB7", period:"day"},
-  {key:"page_impressions_unique",label:"Reach",         color:"#0F6E56", period:"day"},
-  {key:"page_views_total",       label:"Page Views",    color:"#BA7517", period:"day"},
-  {key:"page_fan_adds",          label:"New Followers", color:"#185FA5", period:"day"},
-  {key:"page_post_engagements",  label:"Engagement",    color:"#993556", period:"day"},
+  {key:"page_impressions",        label:"Impressions",   color:"#534AB7"},
+  {key:"page_impressions_unique", label:"Reach",         color:"#0F6E56"},
+  {key:"page_views_total",        label:"Page Views",    color:"#BA7517"},
+  {key:"page_fan_adds",           label:"New Followers", color:"#185FA5"},
+  {key:"page_post_engagements",   label:"Engagement",    color:"#993556"},
 ];
 
 let pages=[], selPage=null, period=28, activeMetric=METRICS[0];
@@ -82,11 +81,11 @@ function switchTab(tab){
   document.getElementById('view-posts').style.display=tab==='posts'?'block':'none';
   const ti=document.getElementById('tab-insights'),tp=document.getElementById('tab-posts');
   if(tab==='insights'){
-    ti.style.background='var(--color-background-primary)';ti.style.fontWeight='500';ti.style.color='var(--color-text-primary)';ti.style.border='0.5px solid var(--color-border-tertiary)';
-    tp.style.background='transparent';tp.style.fontWeight='400';tp.style.color='var(--color-text-secondary)';tp.style.border='none';
+    ti.style.cssText+='background:var(--color-background-primary);font-weight:500;color:var(--color-text-primary);border:0.5px solid var(--color-border-tertiary);';
+    tp.style.cssText+='background:transparent;font-weight:400;color:var(--color-text-secondary);border:none;';
   }else{
-    tp.style.background='var(--color-background-primary)';tp.style.fontWeight='500';tp.style.color='var(--color-text-primary)';tp.style.border='0.5px solid var(--color-border-tertiary)';
-    ti.style.background='transparent';ti.style.fontWeight='400';ti.style.color='var(--color-text-secondary)';ti.style.border='none';
+    tp.style.cssText+='background:var(--color-background-primary);font-weight:500;color:var(--color-text-primary);border:0.5px solid var(--color-border-tertiary);';
+    ti.style.cssText+='background:transparent;font-weight:400;color:var(--color-text-secondary);border:none;';
     if(!postsLoaded&&selPage)loadPosts(selPage);
   }
 }
@@ -100,10 +99,7 @@ function setPeriod(d,btn){
   if(selPage)fetchInsights(selPage);
 }
 
-function setMetric(key){
-  activeMetric=METRICS.find(m=>m.key===key);
-  renderMetricTabs();updateLineChart();
-}
+function setMetric(key){activeMetric=METRICS.find(m=>m.key===key);renderMetricTabs();updateLineChart();}
 
 function renderMetricTabs(){
   document.getElementById('metric-tabs').innerHTML=METRICS.map(m=>`
@@ -119,33 +115,37 @@ function updateLineChart(){
   lineChart.update();
 }
 
+async function fetchSingleMetric(pageId, pageToken, metricKey, since, until){
+  try{
+    const url=`${BASE}/${pageId}/insights/${metricKey}/day?since=${since}&until=${until}&access_token=${pageToken}`;
+    const res=await fetch(url);
+    const data=await res.json();
+    if(data.error){console.warn(metricKey+':',data.error.message);return null;}
+    return data.data||[];
+  }catch(e){console.warn(metricKey,e);return null;}
+}
+
 async function fetchInsights(page){
-  document.getElementById('stat-cards').innerHTML=METRICS.map(()=>`<div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem;height:72px;opacity:0.4;animation:pulse 1.5s infinite;"></div>`).join('');
   document.getElementById('error-box').style.display='none';
+  document.getElementById('stat-cards').innerHTML=METRICS.map(()=>`<div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem;height:72px;opacity:0.4;animation:pulse 1.5s infinite;"></div>`).join('');
 
   const since=Math.floor(Date.now()/1000)-period*86400;
   const until=Math.floor(Date.now()/1000);
-
-  // Metric тус бүрийг дангаар татна — нэг буруу metric бүгдийг унагаахгүй
   const totals={}, byDate={};
 
   await Promise.all(METRICS.map(async m=>{
-    try{
-      const url=`${BASE}/${page.id}/insights/${m.key}/day?since=${since}&until=${until}&access_token=${page.access_token}`;
-      const res=await fetch(url);
-      const data=await res.json();
-      if(data.error){console.warn(m.key,data.error.message);return;}
-      let total=0;
-      (data.data||[]).forEach(item=>{
-        (item.values||[]).forEach(v=>{
-          const val=typeof v.value==='object'?Object.values(v.value).reduce((a,b)=>a+b,0):(v.value||0);
-          total+=val;
-          const date=v.end_time?.slice(5,10);
-          if(date){if(!byDate[date])byDate[date]={date};byDate[date][m.key]=(byDate[date][m.key]||0)+val;}
-        });
+    const rows=await fetchSingleMetric(page.id, page.access_token, m.key, since, until);
+    if(!rows)return;
+    let total=0;
+    rows.forEach(item=>{
+      (item.values||[]).forEach(v=>{
+        const val=typeof v.value==='object'?Object.values(v.value).reduce((a,b)=>a+b,0):(v.value||0);
+        total+=val;
+        const date=v.end_time?.slice(5,10);
+        if(date){if(!byDate[date])byDate[date]={date};byDate[date][m.key]=(byDate[date][m.key]||0)+val;}
       });
-      totals[m.key]=total;
-    }catch(e){console.warn('fetch err',m.key,e);}
+    });
+    totals[m.key]=total;
   }));
 
   document.getElementById('stat-cards').innerHTML=METRICS.map(m=>`
@@ -193,12 +193,12 @@ function renderPosts(){
   const tI=posts.reduce((s,p)=>s+(p.impressions||0),0);
   const tR=posts.reduce((s,p)=>s+(p.reach||0),0);
   const tE=posts.reduce((s,p)=>s+(p.engagement||0),0);
-  document.getElementById('post-count').textContent=`${posts.length} post`;
+  document.getElementById('post-count').textContent=posts.length+' post';
   document.getElementById('summary-cards').innerHTML=`
-    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem;border-left:3px solid #534AB7;"><div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:6px;text-transform:uppercase;">Нийт Post</div><div style="font-size:22px;font-weight:500;color:var(--color-text-primary);font-family:var(--font-mono)">${posts.length}</div></div>
-    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem;border-left:3px solid #0F6E56;"><div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:6px;text-transform:uppercase;">Нийт Reach</div><div style="font-size:22px;font-weight:500;color:var(--color-text-primary);font-family:var(--font-mono)">${fmt(tR)}</div></div>
-    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem;border-left:3px solid #BA7517;"><div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:6px;text-transform:uppercase;">Нийт Impressions</div><div style="font-size:22px;font-weight:500;color:var(--color-text-primary);font-family:var(--font-mono)">${fmt(tI)}</div></div>
-    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem;border-left:3px solid #993556;"><div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:6px;text-transform:uppercase;">Нийт Engagement</div><div style="font-size:22px;font-weight:500;color:var(--color-text-primary);font-family:var(--font-mono)">${fmt(tE)}</div></div>`;
+    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem;border-left:3px solid #534AB7;"><div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Нийт Post</div><div style="font-size:22px;font-weight:500;color:var(--color-text-primary);font-family:var(--font-mono)">${posts.length}</div></div>
+    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem;border-left:3px solid #0F6E56;"><div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Нийт Reach</div><div style="font-size:22px;font-weight:500;color:var(--color-text-primary);font-family:var(--font-mono)">${fmt(tR)}</div></div>
+    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem;border-left:3px solid #BA7517;"><div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Нийт Impressions</div><div style="font-size:22px;font-weight:500;color:var(--color-text-primary);font-family:var(--font-mono)">${fmt(tI)}</div></div>
+    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem;border-left:3px solid #993556;"><div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Нийт Engagement</div><div style="font-size:22px;font-weight:500;color:var(--color-text-primary);font-family:var(--font-mono)">${fmt(tE)}</div></div>`;
   const bc=sk==='impressions'?'#534AB7':sk==='reach'?'#0F6E56':'#993556';
   document.getElementById('posts-list').innerHTML=sorted.map((p,i)=>{
     const bw=Math.round(((p[sk]||0)/maxVal)*100);
