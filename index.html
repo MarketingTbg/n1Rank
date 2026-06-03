@@ -1,37 +1,74 @@
 
-<h2 class="sr-only">Facebook хамгийн их үзэлттэй post-уудын жагсаалт rank-тай</h2>
-<div id="app" style="padding:1rem 0; font-family:var(--font-sans);">
-  <div id="loading" style="text-align:center;padding:3rem;color:var(--color-text-secondary);font-size:14px;">
-    <i class="ti ti-loader" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.5"></i>
-    Post-уудын мэдээлэл татаж байна...
-  </div>
+<div id="app" style="padding:1rem 0;font-family:var(--font-sans);">
+  <div id="loading" style="text-align:center;padding:3rem;color:var(--color-text-secondary);font-size:14px;">Facebook хуудасны жагсаалт татаж байна...</div>
   <div id="error-box" style="display:none;background:var(--color-background-danger);color:var(--color-text-danger);border:0.5px solid var(--color-border-danger);border-radius:var(--border-radius-md);padding:12px 16px;font-size:13px;margin-bottom:1rem;"></div>
   <div id="main" style="display:none;">
+
+    <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1.5rem;">
       <div>
-        <div style="font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Top Posts Ranking</div>
+        <div style="font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Facebook Insights</div>
         <div style="font-size:20px;font-weight:500;color:var(--color-text-primary)" id="page-title">—</div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <select id="page-sel" onchange="onPageChange()" style="font-size:13px;padding:6px 10px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-primary);"></select>
+        <div style="display:flex;gap:2px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:3px;border:0.5px solid var(--color-border-tertiary);">
+          <button onclick="switchTab('insights')" id="tab-insights" style="padding:5px 12px;border-radius:6px;border:none;background:var(--color-background-primary);cursor:pointer;font-size:12px;font-weight:500;color:var(--color-text-primary);border:0.5px solid var(--color-border-tertiary);">📊 Insights</button>
+          <button onclick="switchTab('posts')" id="tab-posts" style="padding:5px 12px;border-radius:6px;border:none;background:transparent;cursor:pointer;font-size:12px;color:var(--color-text-secondary);">🏆 Top Posts</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSIGHTS TAB -->
+    <div id="view-insights">
+      <div style="display:flex;gap:4px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:3px;border:0.5px solid var(--color-border-tertiary);display:inline-flex;margin-bottom:1.25rem;">
+        <button onclick="setPeriod(7,this)" style="padding:5px 12px;border-radius:6px;border:none;background:transparent;cursor:pointer;font-size:12px;color:var(--color-text-secondary)">7 өдөр</button>
+        <button onclick="setPeriod(28,this)" id="btn28" style="padding:5px 12px;border-radius:6px;border:none;background:var(--color-background-primary);cursor:pointer;font-size:12px;font-weight:500;color:var(--color-text-primary);border:0.5px solid var(--color-border-tertiary)">28 өдөр</button>
+        <button onclick="setPeriod(90,this)" style="padding:5px 12px;border-radius:6px;border:none;background:transparent;cursor:pointer;font-size:12px;color:var(--color-text-secondary)">90 өдөр</button>
+      </div>
+      <div id="stat-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.5rem;"></div>
+      <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:1rem;">
+        <div id="metric-tabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem;"></div>
+        <div style="position:relative;width:100%;height:220px;"><canvas id="lineChart"></canvas></div>
+      </div>
+      <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;">
+        <div style="font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;">Reach vs Views (сүүлийн 14 өдөр)</div>
+        <div style="position:relative;width:100%;height:180px;"><canvas id="barChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- TOP POSTS TAB -->
+    <div id="view-posts" style="display:none;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap;">
         <select id="sort-sel" onchange="renderPosts()" style="font-size:13px;padding:6px 10px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-primary);">
           <option value="impressions">Impression-аар</option>
           <option value="reach">Reach-аар</option>
           <option value="engagement">Engagement-аар</option>
         </select>
+        <span id="post-count" style="font-size:12px;color:var(--color-text-tertiary);"></span>
       </div>
+      <div id="summary-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.25rem;"></div>
+      <div id="posts-list"></div>
     </div>
 
-    <div id="summary-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1.5rem;"></div>
-
-    <div id="posts-list"></div>
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-const TOKEN = "EAAd4SZASPQAcBRihnFyaRUvkxKcpNlyTZA16dSV2wu2K1m4VgekYqc0cnL0g5TYOP5E7t4YsSSuw8f56KBxKETJTGZALfopZATYeLVGm8cZBwNTX9KXX8xUmuw62k4vqJBSjLl1CEmkFdKyXnrNoAhuGZAWBNsU1b2l3C54IZCXJw2QZAsL0cd86K4RQY3gD40SJqj3rIUe4FZAIOAYxou7SYj9fLnTdjdgZAcuNZC6qaaoIcQmFOQs0DhoZCQEJuZC5deXtvVZCFeLTtqF0T3oJU6tkDJkQZDZD";
+const TOKEN = "EAAd4SZASPQAcBRoMTuXDYOPVszoxXRHuxMd2s9xcQqhL3eMqbpAo1ZBc0PCYGq6EpUsHq3JY4wRT5FaCZA1IbLBnTXF3TiviqFIZBaX1e354T8SG8GjU5LZAKKibM4ZBFsi1RWbgeheGe5adDFuT2bVdAuIEphakZCFZBJVAXDea54R1K8uktoZBOcTJyzBvzY0RSd0PzPOoEP9ZCZA9ks210wWDbnuoiBct447EgZDZD";
 const BASE = "https://graph.facebook.com/v25.0";
-let pages=[], posts=[];
+const METRICS = [
+  {key:"page_impressions",label:"Impressions",color:"#534AB7"},
+  {key:"page_impressions_unique",label:"Reach",color:"#0F6E56"},
+  {key:"page_views_total",label:"Page Views",color:"#BA7517"},
+  {key:"page_fan_adds_unique",label:"New Followers",color:"#185FA5"},
+  {key:"page_post_engagements",label:"Engagement",color:"#993556"},
+];
+
+let pages=[], selPage=null, period=28, activeMetric=METRICS[0];
+let lineChart=null, barChart=null, chartData=[], posts=[], postsLoaded=false;
+let currentTab='insights';
 
 function showError(msg){
   document.getElementById('error-box').textContent='⚠️ '+msg;
@@ -39,23 +76,109 @@ function showError(msg){
   document.getElementById('loading').style.display='none';
   document.getElementById('main').style.display='block';
 }
+function fmt(n){return n!=null?Number(n).toLocaleString():'—';}
 
-function medal(rank){
-  if(rank===1) return '<span style="font-size:18px;">🥇</span>';
-  if(rank===2) return '<span style="font-size:18px;">🥈</span>';
-  if(rank===3) return '<span style="font-size:18px;">🥉</span>';
-  return `<span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);font-size:12px;font-weight:500;color:var(--color-text-secondary);">${rank}</span>`;
+function switchTab(tab){
+  currentTab=tab;
+  document.getElementById('view-insights').style.display=tab==='insights'?'block':'none';
+  document.getElementById('view-posts').style.display=tab==='posts'?'block':'none';
+  const ti=document.getElementById('tab-insights'), tp=document.getElementById('tab-posts');
+  if(tab==='insights'){
+    ti.style.background='var(--color-background-primary)';ti.style.fontWeight='500';ti.style.color='var(--color-text-primary)';ti.style.border='0.5px solid var(--color-border-tertiary)';
+    tp.style.background='transparent';tp.style.fontWeight='400';tp.style.color='var(--color-text-secondary)';tp.style.border='none';
+  } else {
+    tp.style.background='var(--color-background-primary)';tp.style.fontWeight='500';tp.style.color='var(--color-text-primary)';tp.style.border='0.5px solid var(--color-border-tertiary)';
+    ti.style.background='transparent';ti.style.fontWeight='400';ti.style.color='var(--color-text-secondary)';ti.style.border='none';
+    if(!postsLoaded&&selPage) loadPosts(selPage);
+  }
 }
 
-function fmt(n){ return n!=null?Number(n).toLocaleString():'—'; }
+function setPeriod(d,btn){
+  period=d;
+  document.querySelectorAll('[onclick^="setPeriod"]').forEach(b=>{
+    b.style.background='transparent';b.style.border='none';b.style.fontWeight='400';b.style.color='var(--color-text-secondary)';
+  });
+  btn.style.background='var(--color-background-primary)';btn.style.border='0.5px solid var(--color-border-tertiary)';btn.style.fontWeight='500';btn.style.color='var(--color-text-primary)';
+  if(selPage) fetchInsights(selPage);
+}
 
-function renderSummary(){
-  const sortKey = document.getElementById('sort-sel').value;
-  const sorted = [...posts].sort((a,b)=>(b[sortKey]||0)-(a[sortKey]||0));
-  const totalImp = posts.reduce((s,p)=>s+(p.impressions||0),0);
-  const totalReach = posts.reduce((s,p)=>s+(p.reach||0),0);
-  const totalEng = posts.reduce((s,p)=>s+(p.engagement||0),0);
-  document.getElementById('summary-cards').innerHTML = `
+function setMetric(key){
+  activeMetric=METRICS.find(m=>m.key===key);
+  renderMetricTabs();
+  updateLineChart();
+}
+
+function renderMetricTabs(){
+  document.getElementById('metric-tabs').innerHTML=METRICS.map(m=>`
+    <button onclick="setMetric('${m.key}')" style="padding:4px 10px;border-radius:14px;border:0.5px solid ${activeMetric.key===m.key?m.color:'var(--color-border-tertiary)'};background:${activeMetric.key===m.key?m.color+'22':'transparent'};color:${activeMetric.key===m.key?m.color:'var(--color-text-tertiary)'};cursor:pointer;font-size:11px;font-weight:${activeMetric.key===m.key?'500':'400'}">${m.label}</button>`).join('');
+}
+
+function updateLineChart(){
+  if(!lineChart)return;
+  lineChart.data.labels=chartData.map(d=>d.date);
+  lineChart.data.datasets[0].data=chartData.map(d=>d[activeMetric.key]||0);
+  lineChart.data.datasets[0].borderColor=activeMetric.color;
+  lineChart.data.datasets[0].pointBackgroundColor=activeMetric.color;
+  lineChart.update();
+}
+
+async function fetchInsights(page){
+  document.getElementById('stat-cards').innerHTML=METRICS.map(()=>`<div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem;height:70px;opacity:0.4;animation:pulse 1.5s infinite;"></div>`).join('');
+  const since=Math.floor(Date.now()/1000)-period*86400;
+  const until=Math.floor(Date.now()/1000);
+  const keys=METRICS.map(m=>m.key).join(',');
+  try{
+    const res=await fetch(`${BASE}/${page.id}/insights?metric=${keys}&period=day&since=${since}&until=${until}&access_token=${page.access_token}`);
+    const data=await res.json();
+    if(data.error)throw new Error(data.error.message);
+    const totals={},byDate={};
+    (data.data||[]).forEach(metric=>{
+      let total=0;
+      (metric.values||[]).forEach(v=>{
+        total+=v.value||0;
+        const date=v.end_time?.slice(5,10);
+        if(date){if(!byDate[date])byDate[date]={date};byDate[date][metric.name]=(byDate[date][metric.name]||0)+(v.value||0);}
+      });
+      totals[metric.name]=total;
+    });
+    document.getElementById('stat-cards').innerHTML=METRICS.map(m=>`
+      <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem;border-left:3px solid ${m.color};">
+        <div style="font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">${m.label}</div>
+        <div style="font-size:22px;font-weight:500;color:var(--color-text-primary);font-family:var(--font-mono)">${fmt(totals[m.key])}</div>
+      </div>`).join('');
+    chartData=Object.values(byDate).sort((a,b)=>a.date.localeCompare(b.date));
+    const last14=chartData.slice(-14);
+    if(lineChart)lineChart.destroy();
+    lineChart=new Chart(document.getElementById('lineChart'),{
+      type:'line',
+      data:{labels:chartData.map(d=>d.date),datasets:[{label:activeMetric.label,data:chartData.map(d=>d[activeMetric.key]||0),borderColor:activeMetric.color,pointBackgroundColor:activeMetric.color,borderWidth:2,pointRadius:2,tension:0.3,fill:false}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${Number(ctx.parsed.y).toLocaleString()}`}}},scales:{x:{ticks:{color:'#888',font:{size:10}},grid:{display:false}},y:{ticks:{color:'#888',font:{size:10}},grid:{color:'rgba(128,128,128,0.1)'}}}}
+    });
+    if(barChart)barChart.destroy();
+    barChart=new Chart(document.getElementById('barChart'),{
+      type:'bar',
+      data:{labels:last14.map(d=>d.date),datasets:[{label:'Reach',data:last14.map(d=>d.page_impressions_unique||0),backgroundColor:'#0F6E5666',borderColor:'#0F6E56',borderWidth:1,borderRadius:3},{label:'Views',data:last14.map(d=>d.page_views_total||0),backgroundColor:'#BA751766',borderColor:'#BA7517',borderWidth:1,borderRadius:3}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'var(--color-text-secondary)',font:{size:11}}}},scales:{x:{ticks:{color:'#888',font:{size:10}},grid:{display:false}},y:{ticks:{color:'#888',font:{size:10}},grid:{color:'rgba(128,128,128,0.1)'}}}}
+    });
+    renderMetricTabs();
+  }catch(e){showError('Insights татахад алдаа: '+e.message);}
+}
+
+function medal(rank){
+  if(rank===1)return'🥇';if(rank===2)return'🥈';if(rank===3)return'🥉';
+  return`<span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);font-size:11px;font-weight:500;color:var(--color-text-secondary);">${rank}</span>`;
+}
+
+function renderPosts(){
+  if(!posts.length)return;
+  const sortKey=document.getElementById('sort-sel').value;
+  const sorted=[...posts].sort((a,b)=>(b[sortKey]||0)-(a[sortKey]||0));
+  const maxVal=sorted[0]?.[sortKey]||1;
+  const totalImp=posts.reduce((s,p)=>s+(p.impressions||0),0);
+  const totalReach=posts.reduce((s,p)=>s+(p.reach||0),0);
+  const totalEng=posts.reduce((s,p)=>s+(p.engagement||0),0);
+  document.getElementById('post-count').textContent=`${posts.length} post`;
+  document.getElementById('summary-cards').innerHTML=`
     <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem;border-left:3px solid #534AB7;">
       <div style="font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Нийт Post</div>
       <div style="font-size:22px;font-weight:500;color:var(--color-text-primary);font-family:var(--font-mono)">${posts.length}</div>
@@ -71,39 +194,27 @@ function renderSummary(){
     <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem;border-left:3px solid #993556;">
       <div style="font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Нийт Engagement</div>
       <div style="font-size:22px;font-weight:500;color:var(--color-text-primary);font-family:var(--font-mono)">${fmt(totalEng)}</div>
-    </div>
-  `;
-}
-
-function renderPosts(){
-  const sortKey = document.getElementById('sort-sel').value;
-  const sorted = [...posts].sort((a,b)=>(b[sortKey]||0)-(a[sortKey]||0));
-  renderSummary();
-  const maxVal = sorted[0]?.[sortKey]||1;
-
-  document.getElementById('posts-list').innerHTML = sorted.map((p,i)=>{
-    const barW = Math.round(((p[sortKey]||0)/maxVal)*100);
-    const date = p.created_time?new Date(p.created_time).toLocaleDateString('mn-MN',{month:'short',day:'numeric',year:'numeric'}):'';
-    const msg = (p.message||'').slice(0,120) + ((p.message||'').length>120?'…':'');
-    const isTop = i<3;
-
-    return `
-    <div style="display:flex;gap:12px;align-items:flex-start;background:var(--color-background-primary);border:${isTop?'1.5px solid var(--color-border-info)':'0.5px solid var(--color-border-tertiary)'};border-radius:var(--border-radius-lg);padding:14px;margin-bottom:10px;position:relative;">
+    </div>`;
+  const barColor=sortKey==='impressions'?'#534AB7':sortKey==='reach'?'#0F6E56':'#993556';
+  document.getElementById('posts-list').innerHTML=sorted.map((p,i)=>{
+    const barW=Math.round(((p[sortKey]||0)/maxVal)*100);
+    const date=p.created_time?new Date(p.created_time).toLocaleDateString('mn-MN',{month:'short',day:'numeric',year:'numeric'}):'';
+    const msg=(p.message||'').slice(0,120)+((p.message||'').length>120?'…':'');
+    const isTop=i<3;
+    return`<div style="display:flex;gap:12px;align-items:flex-start;background:var(--color-background-primary);border:${isTop?'1.5px solid var(--color-border-info)':'0.5px solid var(--color-border-tertiary)'};border-radius:var(--border-radius-lg);padding:14px;margin-bottom:10px;position:relative;">
       ${isTop?`<div style="position:absolute;top:-1px;right:12px;background:var(--color-background-info);color:var(--color-text-info);font-size:10px;font-weight:500;padding:2px 8px;border-radius:0 0 6px 6px;letter-spacing:0.5px;">TOP ${i+1}</div>`:''}
-      <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;width:32px;margin-top:2px;">
-        ${medal(i+1)}
-      </div>
-      ${p.image?`<img src="${p.image}" alt="post зураг" style="width:72px;height:72px;object-fit:cover;border-radius:8px;flex-shrink:0;border:0.5px solid var(--color-border-tertiary);">`:`<div style="width:72px;height:72px;border-radius:8px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ti ti-photo-off" style="font-size:20px;color:var(--color-text-tertiary)" aria-hidden="true"></i></div>`}
+      <div style="flex-shrink:0;font-size:18px;margin-top:2px;width:28px;text-align:center;">${medal(i+1)}</div>
+      ${p.image?`<img src="${p.image}" alt="post" style="width:72px;height:72px;object-fit:cover;border-radius:8px;flex-shrink:0;border:0.5px solid var(--color-border-tertiary);">`:`<div style="width:72px;height:72px;border-radius:8px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px;">📄</div>`}
       <div style="flex:1;min-width:0;">
-        <div style="font-size:13px;color:var(--color-text-primary);margin-bottom:6px;line-height:1.4;">${msg||'<em style="color:var(--color-text-tertiary)">Текст байхгүй (зураг/видео)</em>'}</div>
+        <div style="font-size:13px;color:var(--color-text-primary);margin-bottom:6px;line-height:1.4;">${msg||'<em style="color:var(--color-text-tertiary)">Зураг/видео post</em>'}</div>
         <div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:8px;">${date}</div>
         <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
-          <span style="font-size:12px;color:var(--color-text-secondary);"><i class="ti ti-eye" style="font-size:13px;vertical-align:-1px;margin-right:3px" aria-hidden="true"></i>${fmt(p.impressions)}</span>
-          <span style="font-size:12px;color:var(--color-text-secondary);"><i class="ti ti-users" style="font-size:13px;vertical-align:-1px;margin-right:3px" aria-hidden="true"></i>${fmt(p.reach)}</span>
-          <span style="font-size:12px;color:var(--color-text-secondary);"><i class="ti ti-heart" style="font-size:13px;vertical-align:-1px;margin-right:3px" aria-hidden="true"></i>${fmt(p.engagement)}</span>
+          <span style="font-size:12px;color:var(--color-text-secondary);">👁 ${fmt(p.impressions)}</span>
+          <span style="font-size:12px;color:var(--color-text-secondary);">👥 ${fmt(p.reach)}</span>
+          <span style="font-size:12px;color:var(--color-text-secondary);">❤️ ${fmt(p.engagement)}</span>
         </div>
         <div style="background:var(--color-background-secondary);border-radius:4px;height:5px;width:100%;overflow:hidden;">
-          <div style="height:100%;width:${barW}%;background:${sortKey==='impressions'?'#534AB7':sortKey==='reach'?'#0F6E56':'#993556'};border-radius:4px;transition:width 0.4s ease;"></div>
+          <div style="height:100%;width:${barW}%;background:${barColor};border-radius:4px;"></div>
         </div>
       </div>
     </div>`;
@@ -111,56 +222,63 @@ function renderPosts(){
 }
 
 async function loadPosts(page){
+  postsLoaded=true;
+  posts=[];
   document.getElementById('posts-list').innerHTML=`<div style="text-align:center;padding:2rem;color:var(--color-text-tertiary);font-size:13px;">Post-уудын insights татаж байна...</div>`;
   document.getElementById('summary-cards').innerHTML='';
-  posts=[];
-  try {
-    const res = await fetch(`${BASE}/${page.id}/posts?fields=id,message,created_time,full_picture&limit=25&access_token=${page.access_token}`);
-    const data = await res.json();
-    if(data.error) throw new Error(data.error.message);
-    const rawPosts = data.data||[];
+  try{
+    const res=await fetch(`${BASE}/${page.id}/posts?fields=id,message,created_time,full_picture&limit=25&access_token=${page.access_token}`);
+    const data=await res.json();
+    if(data.error)throw new Error(data.error.message);
+    const rawPosts=data.data||[];
     if(!rawPosts.length){document.getElementById('posts-list').innerHTML='<div style="text-align:center;padding:2rem;color:var(--color-text-tertiary);">Post олдсонгүй.</div>';return;}
-
-    // Fetch insights for each post in batches
-    const results = await Promise.all(rawPosts.map(async p=>{
-      try {
-        const ir = await fetch(`${BASE}/${p.id}/insights?metric=post_impressions,post_impressions_unique,post_engaged_users&access_token=${page.access_token}`);
-        const id = await ir.json();
-        const ins = {};
+    const results=await Promise.all(rawPosts.map(async p=>{
+      try{
+        const ir=await fetch(`${BASE}/${p.id}/insights?metric=post_impressions,post_impressions_unique,post_engaged_users&access_token=${page.access_token}`);
+        const id=await ir.json();
+        const ins={};
         (id.data||[]).forEach(m=>{
-          const v = m.values?.[0]?.value||0;
-          if(m.name==='post_impressions') ins.impressions=v;
-          if(m.name==='post_impressions_unique') ins.reach=v;
-          if(m.name==='post_engaged_users') ins.engagement=v;
+          const v=m.values?.[0]?.value||0;
+          if(m.name==='post_impressions')ins.impressions=v;
+          if(m.name==='post_impressions_unique')ins.reach=v;
+          if(m.name==='post_engaged_users')ins.engagement=v;
         });
-        return {...p, image:p.full_picture||null, ...ins};
-      } catch(e){ return {...p, image:p.full_picture||null}; }
+        return{...p,image:p.full_picture||null,...ins};
+      }catch(e){return{...p,image:p.full_picture||null};}
     }));
-    posts = results;
+    posts=results;
     renderPosts();
-  } catch(e){ showError('Post татахад алдаа: '+e.message); }
+  }catch(e){showError('Post татахад алдаа: '+e.message);}
 }
 
 function onPageChange(){
-  const id = document.getElementById('page-sel').value;
-  const page = pages.find(p=>p.id===id);
-  if(page){ document.getElementById('page-title').textContent=page.name; loadPosts(page); }
+  const id=document.getElementById('page-sel').value;
+  selPage=pages.find(p=>p.id===id);
+  if(selPage){
+    document.getElementById('page-title').textContent=selPage.name;
+    postsLoaded=false;posts=[];
+    if(currentTab==='insights')fetchInsights(selPage);
+    else loadPosts(selPage);
+  }
 }
 
 async function init(){
-  try {
-    const res = await fetch(`${BASE}/me/accounts?fields=id,name,access_token&access_token=${TOKEN}`);
-    const data = await res.json();
-    if(data.error) throw new Error(data.error.message);
-    pages = data.data||[];
-    if(!pages.length) throw new Error('Manage хийдэг Facebook хуудас олдсонгүй.');
-    const sel = document.getElementById('page-sel');
-    pages.forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent=p.name; sel.appendChild(o); });
+  try{
+    const res=await fetch(`${BASE}/me/accounts?fields=id,name,access_token&access_token=${TOKEN}`);
+    const data=await res.json();
+    if(data.error)throw new Error(data.error.message);
+    pages=data.data||[];
+    if(!pages.length)throw new Error('Manage хийдэг Facebook хуудас олдсонгүй.');
+    const sel=document.getElementById('page-sel');
+    pages.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=p.name;sel.appendChild(o);});
     document.getElementById('loading').style.display='none';
     document.getElementById('main').style.display='block';
-    document.getElementById('page-title').textContent=pages[0].name;
-    loadPosts(pages[0]);
-  } catch(e){ showError(e.message); }
+    selPage=pages[0];
+    document.getElementById('page-title').textContent=selPage.name;
+    renderMetricTabs();
+    fetchInsights(selPage);
+  }catch(e){showError(e.message);}
 }
 init();
 </script>
+<style>@keyframes pulse{0%,100%{opacity:0.5}50%{opacity:0.2}}</style>
